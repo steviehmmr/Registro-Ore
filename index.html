@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Registro Lavori</title>
+    <style>
+        :root {
+            --bg-color: #f7f4ef;
+            --text-main: #3e362e;
+            --text-light: #7a7065;
+            --lavoro1-color: #c45532; /* Terracotta */
+            --lavoro2-color: #2c5f72; /* Ottanio/Blu scuro */
+            --card-bg: #ffffff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            padding: 20px;
+            padding-bottom: 80px;
+        }
+
+        .container { max-width: 500px; margin: 0 auto; }
+
+        .header { text-align: center; margin-bottom: 30px; margin-top: 20px; }
+        .header-icon {
+            background: var(--lavoro1-color);
+            color: white;
+            width: 60px; height: 60px;
+            border-radius: 16px;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 28px; margin-bottom: 15px;
+        }
+        h1 { font-family: "Playfair Display", Georgia, serif; font-size: 32px; margin-bottom: 10px; }
+        .subtitle { color: var(--text-light); font-size: 15px; line-height: 1.5; }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            margin-bottom: 24px;
+        }
+
+        .card-header {
+            border-top: 5px solid var(--lavoro1-color);
+            border-top-left-radius: 16px; border-top-right-radius: 16px;
+            margin: -24px -24px 20px -24px; padding: 20px 24px 0 24px;
+        }
+
+        h2 { font-family: "Playfair Display", Georgia, serif; font-size: 22px; margin-bottom: 5px; }
+
+        .form-group { margin-bottom: 18px; }
+        label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; color: var(--text-main); }
+        
+        input[type="text"], input[type="number"], input[type="time"], select {
+            width: 100%; padding: 12px;
+            border: 1px solid #e0dbce;
+            border-radius: 8px; font-size: 16px;
+            background-color: #faf9f7;
+            color: var(--text-main);
+            appearance: none;
+        }
+
+        .row { display: flex; gap: 15px; }
+        .col { flex: 1; }
+
+        /* Stile per la selezione del lavoro */
+        .job-selector { display: flex; gap: 10px; margin-bottom: 20px; }
+        .job-option {
+            flex: 1; text-align: center; padding: 12px;
+            border: 2px solid #e0dbce; border-radius: 8px;
+            font-weight: bold; color: var(--text-light);
+            transition: 0.2s;
+        }
+        input[type="radio"] { display: none; }
+        
+        /* Colori dinamici selezione */
+        #job1:checked + label { border-color: var(--lavoro1-color); background: #fdf5f3; color: var(--lavoro1-color); }
+        #job2:checked + label { border-color: var(--lavoro2-color); background: #f2f7f9; color: var(--lavoro2-color); }
+
+        button {
+            width: 100%; padding: 16px;
+            background-color: var(--lavoro1-color);
+            color: white; border: none; border-radius: 8px;
+            font-size: 16px; font-weight: 600;
+            cursor: pointer; transition: background 0.2s;
+            margin-top: 10px;
+        }
+        button:active { opacity: 0.8; }
+
+        /* Stile dei record salvati */
+        .record-card {
+            background: white; border-radius: 12px; padding: 16px;
+            margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border-left: 5px solid; position: relative;
+        }
+        .record-job1 { border-left-color: var(--lavoro1-color); }
+        .record-job2 { border-left-color: var(--lavoro2-color); }
+        
+        .record-title { font-weight: bold; font-size: 16px; margin-bottom: 4px; }
+        .record-details { color: var(--text-light); font-size: 14px; margin-bottom: 10px; }
+        .record-price { font-weight: bold; font-size: 18px; color: var(--text-main); }
+        
+        .delete-btn {
+            position: absolute; top: 16px; right: 16px;
+            background: none; border: none; color: #ff4d4d;
+            font-size: 14px; padding: 0; width: auto; font-weight: normal;
+        }
+
+        .summary {
+            background: var(--text-main); color: white;
+            border-radius: 16px; padding: 20px; margin-bottom: 30px;
+        }
+        .summary h2 { color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="header-icon">💼</div>
+        <h1>Registro Lavori</h1>
+        <p class="subtitle">Traccia le ore, calcola i compensi e gestisci i tuoi due lavori in un unico posto.</p>
+    </div>
+
+    <!-- Riepilogo Globale -->
+    <div class="summary">
+        <h2 style="font-family: sans-serif; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; opacity: 0.8;">Riepilogo Totale</h2>
+        <div style="font-size: 32px; font-weight: bold; margin-bottom: 5px;" id="totalEarned">€ 0.00</div>
+        <div style="font-size: 14px; opacity: 0.8;" id="totalHours">0 ore registrate</div>
+    </div>
+
+    <!-- Form di inserimento -->
+    <div class="card">
+        <div class="card-header">
+            <h2>+ Nuovo Lavoro</h2>
+            <p style="color: var(--text-light); font-size: 14px;">Aggiungi un record al registro.</p>
+        </div>
+
+        <form id="workForm">
+            <div class="job-selector">
+                <input type="radio" id="job1" name="jobType" value="Lavoro 1" checked>
+                <label for="job1" class="job-option">Lavoro 1</label>
+                
+                <input type="radio" id="job2" name="jobType" value="Lavoro 2">
+                <label for="job2" class="job-option">Lavoro 2</label>
+            </div>
+
+            <div class="form-group">
+                <label>Descrizione attività</label>
+                <input type="text" id="desc" placeholder="Es. Grafiche compleanno Mario..." required>
+            </div>
+
+            <div class="form-group">
+                <label>Mese</label>
+                <select id="month" required>
+                    <option value="" disabled selected>Seleziona mese...</option>
+                    <option value="Gennaio">Gennaio</option>
+                    <option value="Febbraio">Febbraio</option>
+                    <option value="Marzo">Marzo</option>
+                    <option value="Aprile">Aprile</option>
+                    <option value="Maggio">Maggio</option>
+                    <option value="Giugno">Giugno</option>
+                    <option value="Luglio">Luglio</option>
+                    <option value="Agosto">Agosto</option>
+                    <option value="Settembre">Settembre</option>
+                    <option value="Ottobre">Ottobre</option>
+                    <option value="Novembre">Novembre</option>
+                    <option value="Dicembre">Dicembre</option>
+                </select>
+            </div>
+
+            <div class="row">
+                <div class="col form-group">
+                    <label>Ora inizio</label>
+                    <input type="time" id="timeStart" required>
+                </div>
+                <div class="col form-group">
+                    <label>Ora fine</label>
+                    <input type="time" id="timeEnd" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Tariffa oraria (€)</label>
+                <input type="number" id="rate" placeholder="Es. 15" step="0.5" required>
+            </div>
+
+            <button type="submit" id="submitBtn">Registra Lavoro</button>
+        </form>
+    </div>
+
+    <!-- Lista dei lavori salvati -->
+    <div>
+        <h2 style="font-size: 20px; margin-bottom: 15px; margin-left: 5px;">Storico Registrazioni</h2>
+        <div id="recordsList">
+            <!-- I record appariranno qui -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // Inizializza o recupera i dati dalla memoria del telefono (localStorage)
+    let records = JSON.parse(localStorage.getItem('lavoriData')) || [];
+
+    // Colora il bottone di invio in base al lavoro selezionato
+    const job1Radio = document.getElementById('job1');
+    const job2Radio = document.getElementById('job2');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function updateButtonColor() {
+        if(job1Radio.checked) {
+            submitBtn.style.backgroundColor = 'var(--lavoro1-color)';
+        } else {
+            submitBtn.style.backgroundColor = 'var(--lavoro2-color)';
+        }
+    }
+    job1Radio.addEventListener('change', updateButtonColor);
+    job2Radio.addEventListener('change', updateButtonColor);
+
+    // Calcola la differenza in ore tra due orari
+    function calculateHours(start, end) {
+        let startTime = new Date(`2000-01-01T${start}`);
+        let endTime = new Date(`2000-01-01T${end}`);
+        
+        // Se l'ora di fine è prima di quella di inizio (es. notte), aggiungi un giorno
+        if (endTime < startTime) {
+            endTime.setDate(endTime.getDate() + 1);
+        }
+        
+        let diffMs = endTime - startTime;
+        return diffMs / (1000 * 60 * 60); // Converte i millisecondi in ore
+    }
+
+    // Aggiungi un nuovo record
+    document.getElementById('workForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        let jobType = document.querySelector('input[name="jobType"]:checked').value;
+        let desc = document.getElementById('desc').value;
+        let month = document.getElementById('month').value;
+        let timeStart = document.getElementById('timeStart').value;
+        let timeEnd = document.getElementById('timeEnd').value;
+        let rate = parseFloat(document.getElementById('rate').value);
+
+        let hoursWorked = calculateHours(timeStart, timeEnd);
+        let earned = hoursWorked * rate;
+
+        let newRecord = {
+            id: Date.now(), // ID univoco per poterlo cancellare
+            jobType: jobType,
+            desc: desc,
+            month: month,
+            timeStart: timeStart,
+            timeEnd: timeEnd,
+            hours: hoursWorked,
+            rate: rate,
+            earned: earned
+        };
+
+        records.push(newRecord);
+        saveAndRender();
+        this.reset(); // Svuota il form
+        document.getElementById('job1').checked = true; // Resetta sul lavoro 1
+        updateButtonColor();
+    });
+
+    // Cancella un record
+    function deleteRecord(id) {
+        if(confirm('Vuoi davvero eliminare questa registrazione?')) {
+            records = records.filter(r => r.id !== id);
+            saveAndRender();
+        }
+    }
+
+    // Salva nella memoria e aggiorna lo schermo
+    function saveAndRender() {
+        localStorage.setItem('lavoriData', JSON.stringify(records));
+        
+        const list = document.getElementById('recordsList');
+        list.innerHTML = ''; // Pulisci la lista
+
+        let totalEarned = 0;
+        let totalHours = 0;
+
+        // Ordina i record dal più recente al più vecchio
+        let reversedRecords = [...records].reverse();
+
+        reversedRecords.forEach(record => {
+            totalEarned += record.earned;
+            totalHours += record.hours;
+
+            // Decidi la classe CSS per il colore in base al lavoro
+            let colorClass = record.jobType === 'Lavoro 1' ? 'record-job1' : 'record-job2';
+
+            let card = document.createElement('div');
+            card.className = `record-card ${colorClass}`;
+            card.innerHTML = `
+                <button class="delete-btn" onclick="deleteRecord(${record.id})">Elimina</button>
+                <div class="record-title">${record.desc}</div>
+                <div class="record-details">
+                    <span style="font-weight:bold; color:var(--text-main)">${record.jobType}</span> | ${record.month} | Dalle ${record.timeStart} alle ${record.timeEnd} (${record.hours.toFixed(2)}h)
+                </div>
+                <div class="record-price">€ ${record.earned.toFixed(2)}</div>
+            `;
+            list.appendChild(card);
+        });
+
+        // Aggiorna il riepilogo in alto
+        document.getElementById('totalEarned').innerText = `€ ${totalEarned.toFixed(2)}`;
+        document.getElementById('totalHours').innerText = `${totalHours.toFixed(2)} ore totali registrate`;
+    }
+
+    // Carica i dati all'avvio
+    saveAndRender();
+</script>
+
+</body>
+</html>
