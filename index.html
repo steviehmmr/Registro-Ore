@@ -9,8 +9,8 @@
             --bg-color: #f7f4ef;
             --text-main: #3e362e;
             --text-light: #7a7065;
-            --lavoro1-color: #c45532; /* Terracotta */
-            --lavoro2-color: #2c5f72; /* Ottanio/Blu scuro */
+            --lavoro1-color: #c45532; /* Terracotta di default */
+            --lavoro2-color: #2c5f72; /* Ottanio di default */
             --card-bg: #ffffff;
         }
 
@@ -34,9 +34,26 @@
             border-radius: 16px;
             display: inline-flex; align-items: center; justify-content: center;
             font-size: 28px; margin-bottom: 15px;
+            transition: background 0.3s;
         }
         h1 { font-family: "Playfair Display", Georgia, serif; font-size: 32px; margin-bottom: 10px; }
         .subtitle { color: var(--text-light); font-size: 15px; line-height: 1.5; }
+
+        /* Impostazioni */
+        details.settings-card {
+            background: var(--card-bg); border-radius: 16px; padding: 16px 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 24px;
+        }
+        details > summary { 
+            list-style: none; outline: none; cursor: pointer; 
+            font-weight: 600; font-size: 16px; display: flex; align-items: center;
+        }
+        details > summary::-webkit-details-marker { display: none; }
+        .settings-row { display: flex; gap: 10px; margin-top: 8px; }
+        .settings-row input[type="color"] {
+            width: 48px; height: 48px; padding: 0; border: 2px solid #e0dbce; 
+            border-radius: 8px; cursor: pointer; flex-shrink: 0; background: none;
+        }
 
         .card {
             background: var(--card-bg);
@@ -50,6 +67,7 @@
             border-top: 5px solid var(--lavoro1-color);
             border-top-left-radius: 16px; border-top-right-radius: 16px;
             margin: -24px -24px 20px -24px; padding: 20px 24px 0 24px;
+            transition: border-color 0.3s;
         }
 
         h2 { font-family: "Playfair Display", Georgia, serif; font-size: 22px; margin-bottom: 5px; }
@@ -75,23 +93,41 @@
             flex: 1; text-align: center; padding: 12px;
             border: 2px solid #e0dbce; border-radius: 8px;
             font-weight: bold; color: var(--text-light);
-            transition: 0.2s;
+            transition: 0.2s; cursor: pointer;
         }
         input[type="radio"] { display: none; }
         
-        /* Colori dinamici selezione */
-        #job1:checked + label { border-color: var(--lavoro1-color); background: #fdf5f3; color: var(--lavoro1-color); }
-        #job2:checked + label { border-color: var(--lavoro2-color); background: #f2f7f9; color: var(--lavoro2-color); }
+        /* Colori dinamici selezione (usa color-mix per creare uno sfondo chiaro in base all'HEX) */
+        #job1:checked + label { border-color: var(--lavoro1-color); background: color-mix(in srgb, var(--lavoro1-color) 10%, white); color: var(--lavoro1-color); }
+        #job2:checked + label { border-color: var(--lavoro2-color); background: color-mix(in srgb, var(--lavoro2-color) 10%, white); color: var(--lavoro2-color); }
 
         button {
             width: 100%; padding: 16px;
             background-color: var(--lavoro1-color);
             color: white; border: none; border-radius: 8px;
             font-size: 16px; font-weight: 600;
-            cursor: pointer; transition: background 0.2s;
+            cursor: pointer; transition: background 0.3s;
             margin-top: 10px;
         }
         button:active { opacity: 0.8; }
+        
+        .btn-secondary { background-color: var(--text-main); margin-top: 20px; }
+
+        /* Riepilogo Globale e Parziali */
+        .summary {
+            background: var(--text-main); color: white;
+            border-radius: 16px; padding: 20px; margin-bottom: 24px;
+        }
+        .summary-partials { display: flex; gap: 12px; margin-top: 20px; }
+        .summary-box {
+            flex: 1; padding: 12px; border-radius: 12px;
+            background: var(--card-bg); color: var(--text-main);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .summary-job1 h3 { color: var(--lavoro1-color); font-size: 13px; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px; }
+        .summary-job2 h3 { color: var(--lavoro2-color); font-size: 13px; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.5px; }
+        .box-earned { font-size: 18px; font-weight: bold; margin-bottom: 2px; }
+        .box-hours { font-size: 12px; color: var(--text-light); font-weight: 500; }
 
         /* Stile dei record salvati */
         .record-card {
@@ -102,58 +138,92 @@
         .record-job1 { border-left-color: var(--lavoro1-color); }
         .record-job2 { border-left-color: var(--lavoro2-color); }
         
-        .record-title { font-weight: bold; font-size: 16px; margin-bottom: 4px; }
+        .record-title { font-weight: bold; font-size: 16px; margin-bottom: 4px; padding-right: 60px; }
         .record-details { color: var(--text-light); font-size: 14px; margin-bottom: 10px; }
         .record-price { font-weight: bold; font-size: 18px; color: var(--text-main); }
         
         .delete-btn {
             position: absolute; top: 16px; right: 16px;
-            background: none; border: none; color: #ff4d4d;
-            font-size: 14px; padding: 0; width: auto; font-weight: normal;
+            background: rgba(255, 77, 77, 0.1); color: #ff4d4d;
+            border: none; border-radius: 6px;
+            font-size: 12px; padding: 4px 8px; width: auto; font-weight: 600; margin: 0;
         }
-
-        .summary {
-            background: var(--text-main); color: white;
-            border-radius: 16px; padding: 20px; margin-bottom: 30px;
-        }
-        .summary h2 { color: white; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <div class="header-icon">💼</div>
+        <div class="header-icon" id="mainIcon">💼</div>
         <h1>Registro Lavori</h1>
-        <p class="subtitle">Traccia le ore, calcola i compensi e gestisci i tuoi due lavori in un unico posto.</p>
+        <p class="subtitle">Traccia le ore, calcola i compensi e gestisci i tuoi lavori in un unico posto.</p>
     </div>
+
+    <!-- Pannello Impostazioni -->
+    <details class="settings-card">
+        <summary>⚙️ Impostazioni Lavori</summary>
+        <div style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px;">
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label style="font-size: 12px;">NOME E COLORE 1</label>
+                <div class="settings-row">
+                    <input type="color" id="setJ1Color">
+                    <input type="text" id="setJ1Name" placeholder="Es. Lavoro 1">
+                </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label style="font-size: 12px;">NOME E COLORE 2</label>
+                <div class="settings-row">
+                    <input type="color" id="setJ2Color">
+                    <input type="text" id="setJ2Name" placeholder="Es. Lavoro 2">
+                </div>
+            </div>
+            <button id="saveSettingsBtn" class="btn-secondary">Salva Impostazioni</button>
+        </div>
+    </details>
 
     <!-- Riepilogo Globale -->
     <div class="summary">
-        <h2 style="font-family: sans-serif; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; opacity: 0.8;">Riepilogo Totale</h2>
-        <div style="font-size: 32px; font-weight: bold; margin-bottom: 5px;" id="totalEarned">€ 0.00</div>
-        <div style="font-size: 14px; opacity: 0.8;" id="totalHours">0 ore registrate</div>
+        <div style="text-align: center;">
+            <h2 style="font-family: sans-serif; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; opacity: 0.8; color: white;">Totale Generale</h2>
+            <div style="font-size: 36px; font-weight: bold; margin-bottom: 5px;" id="totalEarned">€ 0.00</div>
+            <div style="font-size: 14px; opacity: 0.8;" id="totalHours">0 ore totali</div>
+        </div>
+
+        <!-- Somme Parziali -->
+        <div class="summary-partials">
+            <div class="summary-box summary-job1">
+                <h3 id="labelJob1Sum">Lavoro 1</h3>
+                <div class="box-earned" id="job1Earned">€ 0.00</div>
+                <div class="box-hours" id="job1Hours">0 h</div>
+            </div>
+            <div class="summary-box summary-job2">
+                <h3 id="labelJob2Sum">Lavoro 2</h3>
+                <div class="box-earned" id="job2Earned">€ 0.00</div>
+                <div class="box-hours" id="job2Hours">0 h</div>
+            </div>
+        </div>
     </div>
 
     <!-- Form di inserimento -->
     <div class="card">
-        <div class="card-header">
+        <div class="card-header" id="cardHeader">
             <h2>+ Nuovo Lavoro</h2>
             <p style="color: var(--text-light); font-size: 14px;">Aggiungi un record al registro.</p>
         </div>
 
         <form id="workForm">
             <div class="job-selector">
-                <input type="radio" id="job1" name="jobType" value="Lavoro 1" checked>
-                <label for="job1" class="job-option">Lavoro 1</label>
+                <!-- Usiamo 'jobId' come riferimento invece del testo fisso -->
+                <input type="radio" id="job1" name="jobId" value="job1" checked>
+                <label for="job1" class="job-option" id="labelOption1">Lavoro 1</label>
                 
-                <input type="radio" id="job2" name="jobType" value="Lavoro 2">
-                <label for="job2" class="job-option">Lavoro 2</label>
+                <input type="radio" id="job2" name="jobId" value="job2">
+                <label for="job2" class="job-option" id="labelOption2">Lavoro 2</label>
             </div>
 
             <div class="form-group">
                 <label>Descrizione attività</label>
-                <input type="text" id="desc" placeholder="Es. Grafiche compleanno Mario..." required>
+                <input type="text" id="desc" placeholder="Es. Grafiche, Turno serale..." required>
             </div>
 
             <div class="form-group">
@@ -205,43 +275,84 @@
 </div>
 
 <script>
-    // Inizializza o recupera i dati dalla memoria del telefono (localStorage)
+    // GESTIONE IMPOSTAZIONI (NOMI E COLORI)
+    let settings = JSON.parse(localStorage.getItem('lavoriSettings')) || {
+        j1Name: 'Lavoro 1', j1Color: '#c45532',
+        j2Name: 'Lavoro 2', j2Color: '#2c5f72'
+    };
+
+    function applySettings() {
+        // Applica i colori personalizzati alla root del documento CSS
+        document.documentElement.style.setProperty('--lavoro1-color', settings.j1Color);
+        document.documentElement.style.setProperty('--lavoro2-color', settings.j2Color);
+        
+        // Aggiorna le etichette testuali (bottoni, riepiloghi, campi input)
+        document.getElementById('labelOption1').innerText = settings.j1Name;
+        document.getElementById('labelOption2').innerText = settings.j2Name;
+        document.getElementById('labelJob1Sum').innerText = settings.j1Name;
+        document.getElementById('labelJob2Sum').innerText = settings.j2Name;
+        
+        document.getElementById('setJ1Name').value = settings.j1Name;
+        document.getElementById('setJ1Color').value = settings.j1Color;
+        document.getElementById('setJ2Name').value = settings.j2Name;
+        document.getElementById('setJ2Color').value = settings.j2Color;
+        
+        updateButtonColor();
+    }
+
+    // Salva le nuove impostazioni
+    document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+        settings.j1Name = document.getElementById('setJ1Name').value || 'Lavoro 1';
+        settings.j1Color = document.getElementById('setJ1Color').value;
+        settings.j2Name = document.getElementById('setJ2Name').value || 'Lavoro 2';
+        settings.j2Color = document.getElementById('setJ2Color').value;
+        
+        localStorage.setItem('lavoriSettings', JSON.stringify(settings));
+        applySettings();
+        saveAndRender(); // Ricarica la lista per aggiornare colori e nomi
+        
+        // Chiudi la tendina
+        document.querySelector('.settings-card').removeAttribute('open');
+    });
+
+    // INIZIALIZZAZIONE DATI
     let records = JSON.parse(localStorage.getItem('lavoriData')) || [];
 
-    // Colora il bottone di invio in base al lavoro selezionato
     const job1Radio = document.getElementById('job1');
     const job2Radio = document.getElementById('job2');
     const submitBtn = document.getElementById('submitBtn');
+    const cardHeader = document.getElementById('cardHeader');
+    const mainIcon = document.getElementById('mainIcon');
 
+    // Cambia il colore del bottone e della linea superiore in base alla selezione
     function updateButtonColor() {
         if(job1Radio.checked) {
             submitBtn.style.backgroundColor = 'var(--lavoro1-color)';
+            cardHeader.style.borderTopColor = 'var(--lavoro1-color)';
+            mainIcon.style.backgroundColor = 'var(--lavoro1-color)';
         } else {
             submitBtn.style.backgroundColor = 'var(--lavoro2-color)';
+            cardHeader.style.borderTopColor = 'var(--lavoro2-color)';
+            mainIcon.style.backgroundColor = 'var(--lavoro2-color)';
         }
     }
     job1Radio.addEventListener('change', updateButtonColor);
     job2Radio.addEventListener('change', updateButtonColor);
 
-    // Calcola la differenza in ore tra due orari
     function calculateHours(start, end) {
         let startTime = new Date(`2000-01-01T${start}`);
         let endTime = new Date(`2000-01-01T${end}`);
-        
-        // Se l'ora di fine è prima di quella di inizio (es. notte), aggiungi un giorno
-        if (endTime < startTime) {
-            endTime.setDate(endTime.getDate() + 1);
-        }
-        
-        let diffMs = endTime - startTime;
-        return diffMs / (1000 * 60 * 60); // Converte i millisecondi in ore
+        if (endTime < startTime) { endTime.setDate(endTime.getDate() + 1); }
+        return (endTime - startTime) / (1000 * 60 * 60); 
     }
 
-    // Aggiungi un nuovo record
+    // REGISTRA UN NUOVO LAVORO
     document.getElementById('workForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
-        let jobType = document.querySelector('input[name="jobType"]:checked').value;
+        // Salviamo l'identificativo job1 o job2 (così resiste al cambio nome)
+        let jobId = document.querySelector('input[name="jobId"]:checked').value; 
+        
         let desc = document.getElementById('desc').value;
         let month = document.getElementById('month').value;
         let timeStart = document.getElementById('timeStart').value;
@@ -252,8 +363,8 @@
         let earned = hoursWorked * rate;
 
         let newRecord = {
-            id: Date.now(), // ID univoco per poterlo cancellare
-            jobType: jobType,
+            id: Date.now(),
+            jobId: jobId, 
             desc: desc,
             month: month,
             timeStart: timeStart,
@@ -265,12 +376,11 @@
 
         records.push(newRecord);
         saveAndRender();
-        this.reset(); // Svuota il form
-        document.getElementById('job1').checked = true; // Resetta sul lavoro 1
+        this.reset();
+        document.getElementById('job1').checked = true; 
         updateButtonColor();
     });
 
-    // Cancella un record
     function deleteRecord(id) {
         if(confirm('Vuoi davvero eliminare questa registrazione?')) {
             records = records.filter(r => r.id !== id);
@@ -278,45 +388,67 @@
         }
     }
 
-    // Salva nella memoria e aggiorna lo schermo
+    // SALVA E AGGIORNA INTERFACCIA
     function saveAndRender() {
         localStorage.setItem('lavoriData', JSON.stringify(records));
         
         const list = document.getElementById('recordsList');
-        list.innerHTML = ''; // Pulisci la lista
+        list.innerHTML = ''; 
 
-        let totalEarned = 0;
-        let totalHours = 0;
+        // Variabili per i totali
+        let totalEarned = 0, totalHours = 0;
+        let job1Earned = 0, job1Hours = 0;
+        let job2Earned = 0, job2Hours = 0;
 
-        // Ordina i record dal più recente al più vecchio
         let reversedRecords = [...records].reverse();
 
         reversedRecords.forEach(record => {
+            // Retrocompatibilità: se hai vecchi record senza "jobId", controllo il vecchio "jobType"
+            let isJob1 = record.jobId === 'job1' || record.jobType === 'Lavoro 1';
+            
+            // Definisco nome e classe CSS in base alle impostazioni
+            let displayName = isJob1 ? settings.j1Name : settings.j2Name;
+            let colorClass = isJob1 ? 'record-job1' : 'record-job2';
+
+            // Calcolo Somme
             totalEarned += record.earned;
             totalHours += record.hours;
+            
+            if(isJob1) {
+                job1Earned += record.earned;
+                job1Hours += record.hours;
+            } else {
+                job2Earned += record.earned;
+                job2Hours += record.hours;
+            }
 
-            // Decidi la classe CSS per il colore in base al lavoro
-            let colorClass = record.jobType === 'Lavoro 1' ? 'record-job1' : 'record-job2';
-
+            // Creazione Card
             let card = document.createElement('div');
             card.className = `record-card ${colorClass}`;
             card.innerHTML = `
                 <button class="delete-btn" onclick="deleteRecord(${record.id})">Elimina</button>
                 <div class="record-title">${record.desc}</div>
                 <div class="record-details">
-                    <span style="font-weight:bold; color:var(--text-main)">${record.jobType}</span> | ${record.month} | Dalle ${record.timeStart} alle ${record.timeEnd} (${record.hours.toFixed(2)}h)
+                    <span style="font-weight:bold; color:var(--text-main)">${displayName}</span> | ${record.month} | Dalle ${record.timeStart} alle ${record.timeEnd} (${record.hours.toFixed(2)}h)
                 </div>
                 <div class="record-price">€ ${record.earned.toFixed(2)}</div>
             `;
             list.appendChild(card);
         });
 
-        // Aggiorna il riepilogo in alto
+        // Aggiorna l'HTML del box riepilogo
         document.getElementById('totalEarned').innerText = `€ ${totalEarned.toFixed(2)}`;
-        document.getElementById('totalHours').innerText = `${totalHours.toFixed(2)} ore totali registrate`;
+        document.getElementById('totalHours').innerText = `${totalHours.toFixed(2)} ore totali`;
+        
+        document.getElementById('job1Earned').innerText = `€ ${job1Earned.toFixed(2)}`;
+        document.getElementById('job1Hours').innerText = `${job1Hours.toFixed(2)} h`;
+        
+        document.getElementById('job2Earned').innerText = `€ ${job2Earned.toFixed(2)}`;
+        document.getElementById('job2Hours').innerText = `${job2Hours.toFixed(2)} h`;
     }
 
-    // Carica i dati all'avvio
+    // Esegui al caricamento
+    applySettings();
     saveAndRender();
 </script>
 
