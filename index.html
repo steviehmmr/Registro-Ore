@@ -129,6 +129,20 @@
         .box-earned { font-size: 18px; font-weight: bold; margin-bottom: 2px; }
         .box-hours { font-size: 12px; color: var(--text-light); font-weight: 500; }
 
+        /* FILTRI */
+        .header-storico { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; margin-left: 5px; }
+        .filter-container { display: flex; gap: 8px; margin-bottom: 20px; }
+        .filter-btn {
+            flex: 1; text-align: center; padding: 10px 5px;
+            border: 1px solid #e0dbce; border-radius: 8px;
+            font-size: 13px; font-weight: 600; color: var(--text-light);
+            cursor: pointer; transition: 0.2s; background: var(--card-bg);
+        }
+        input[name="listFilter"] { display: none; }
+        #filterAll:checked + label { background: var(--text-main); color: white; border-color: var(--text-main); }
+        #filterJ1:checked + label { background: var(--lavoro1-color); color: white; border-color: var(--lavoro1-color); }
+        #filterJ2:checked + label { background: var(--lavoro2-color); color: white; border-color: var(--lavoro2-color); }
+
         /* Stile dei record salvati */
         .record-card {
             background: white; border-radius: 12px; padding: 16px;
@@ -213,7 +227,6 @@
 
         <form id="workForm">
             <div class="job-selector">
-                <!-- Usiamo 'jobId' come riferimento invece del testo fisso -->
                 <input type="radio" id="job1" name="jobId" value="job1" checked>
                 <label for="job1" class="job-option" id="labelOption1">Lavoro 1</label>
                 
@@ -265,9 +278,24 @@
         </form>
     </div>
 
-    <!-- Lista dei lavori salvati -->
+    <!-- Lista dei lavori salvati con FILTRI -->
     <div>
-        <h2 style="font-size: 20px; margin-bottom: 15px; margin-left: 5px;">Storico Registrazioni</h2>
+        <div class="header-storico">
+            <h2 style="font-size: 20px; margin: 0;">Storico Registrazioni</h2>
+        </div>
+        
+        <!-- Bottoni Filtro -->
+        <div class="filter-container">
+            <input type="radio" id="filterAll" name="listFilter" value="all" checked>
+            <label for="filterAll" class="filter-btn">Tutti</label>
+
+            <input type="radio" id="filterJ1" name="listFilter" value="job1">
+            <label for="filterJ1" class="filter-btn" id="filterLabel1">Lavoro 1</label>
+
+            <input type="radio" id="filterJ2" name="listFilter" value="job2">
+            <label for="filterJ2" class="filter-btn" id="filterLabel2">Lavoro 2</label>
+        </div>
+
         <div id="recordsList">
             <!-- I record appariranno qui -->
         </div>
@@ -275,6 +303,17 @@
 </div>
 
 <script>
+    // VARIABILE GLOBALE PER IL FILTRO
+    let currentFilter = 'all';
+
+    // ASCOLTA I CAMBIAMENTI DEL FILTRO
+    document.querySelectorAll('input[name="listFilter"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            currentFilter = e.target.value;
+            saveAndRender();
+        });
+    });
+
     // GESTIONE IMPOSTAZIONI (NOMI E COLORI)
     let settings = JSON.parse(localStorage.getItem('lavoriSettings')) || {
         j1Name: 'Lavoro 1', j1Color: '#c45532',
@@ -286,11 +325,13 @@
         document.documentElement.style.setProperty('--lavoro1-color', settings.j1Color);
         document.documentElement.style.setProperty('--lavoro2-color', settings.j2Color);
         
-        // Aggiorna le etichette testuali (bottoni, riepiloghi, campi input)
+        // Aggiorna le etichette testuali in giro per il sito
         document.getElementById('labelOption1').innerText = settings.j1Name;
         document.getElementById('labelOption2').innerText = settings.j2Name;
         document.getElementById('labelJob1Sum').innerText = settings.j1Name;
         document.getElementById('labelJob2Sum').innerText = settings.j2Name;
+        document.getElementById('filterLabel1').innerText = settings.j1Name;
+        document.getElementById('filterLabel2').innerText = settings.j2Name;
         
         document.getElementById('setJ1Name').value = settings.j1Name;
         document.getElementById('setJ1Color').value = settings.j1Color;
@@ -375,6 +416,11 @@
         };
 
         records.push(newRecord);
+        
+        // Riporta il filtro su "Tutti" dopo aver salvato per far vedere la nuova voce
+        document.getElementById('filterAll').checked = true;
+        currentFilter = 'all';
+
         saveAndRender();
         this.reset();
         document.getElementById('job1').checked = true; 
@@ -405,12 +451,13 @@
         reversedRecords.forEach(record => {
             // Retrocompatibilità: se hai vecchi record senza "jobId", controllo il vecchio "jobType"
             let isJob1 = record.jobId === 'job1' || record.jobType === 'Lavoro 1';
+            let recordJobId = isJob1 ? 'job1' : 'job2';
             
             // Definisco nome e classe CSS in base alle impostazioni
             let displayName = isJob1 ? settings.j1Name : settings.j2Name;
             let colorClass = isJob1 ? 'record-job1' : 'record-job2';
 
-            // Calcolo Somme
+            // Calcolo Somme GLOBALI (vengono sempre calcolate tutte a prescindere dal filtro)
             totalEarned += record.earned;
             totalHours += record.hours;
             
@@ -422,7 +469,12 @@
                 job2Hours += record.hours;
             }
 
-            // Creazione Card
+            // SE IL FILTRO E' ATTIVO E NON CORRISPONDE, SALTO LA CREAZIONE DELLA CARD VISIVA
+            if (currentFilter !== 'all' && currentFilter !== recordJobId) {
+                return; 
+            }
+
+            // Creazione Card Visiva
             let card = document.createElement('div');
             card.className = `record-card ${colorClass}`;
             card.innerHTML = `
@@ -436,7 +488,7 @@
             list.appendChild(card);
         });
 
-        // Aggiorna l'HTML del box riepilogo
+        // Aggiorna l'HTML del box riepilogo in alto
         document.getElementById('totalEarned').innerText = `€ ${totalEarned.toFixed(2)}`;
         document.getElementById('totalHours').innerText = `${totalHours.toFixed(2)} ore totali`;
         
